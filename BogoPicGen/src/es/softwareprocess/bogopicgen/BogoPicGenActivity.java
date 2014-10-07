@@ -35,6 +35,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -51,7 +52,8 @@ import android.widget.Toast;
 public class BogoPicGenActivity extends Activity {
 
 	Uri imageFileUri;
-
+	private static final int RESULT_RANDOM = 10;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -90,16 +92,16 @@ public class BogoPicGenActivity extends Activity {
 
 	private void setBogoPic() {
 		// TODO: Show a toast with message "Generating Photo"
-		
+		Toast.makeText(this, "Generating photo", Toast.LENGTH_LONG).show();
 		
 		// TODO: Get a reference to the image button
-		
+		ImageButton button = (ImageButton) findViewById(R.id.TakeAPhoto);
 		
 		// Generate a bogopic
 		ourBMP = BogoPicGen.generateBitmap(400, 400);
 		
 		// TODO: Assign the bogopic to the button with setImageBitmap
-		
+		button.setImageBitmap(ourBMP);
 	}
 
 	// Call this to accept
@@ -112,13 +114,23 @@ public class BogoPicGenActivity extends Activity {
 		try {	
 			if (intent.getExtras() != null) {
 				// TODO: If cancelled, show a toast, set result to RESULT_CANCELED, finish and return 
-				
+				if (cancel) {
+					Toast.makeText(this, "Photo cancelled", Toast.LENGTH_LONG).show();
+					setResult(RESULT_CANCELED);
+					finish();
+					return;
+				}
 				
 				// If accepted save the picture
 				File intentPicture = getPicturePath(intent);
 				saveBMP(intentPicture, ourBMP);
 				
 				// TODO: set result to RESULT_OK
+				//setResult(RESULT_OK);
+				
+				// Added to send random message back to the caller activity
+				intent.putExtra("RANDOM_MESSAGE", "this is a random message");
+				setResult(RESULT_RANDOM, intent);
 				
 			} else {
 				Toast.makeText(this, "Photo Cancelled: No Reciever?",
